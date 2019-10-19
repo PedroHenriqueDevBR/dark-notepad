@@ -1,5 +1,8 @@
+import 'package:dolar_agora/dal/SQFLite.dart';
+import 'package:dolar_agora/models/Note.dart';
 import 'package:dolar_agora/views/ListItemConfiguration.dart';
 import 'package:dolar_agora/views/ListItemNotes.dart';
+import 'package:dolar_agora/views/ShowNoteActivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -16,20 +19,24 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBarNavigator(),
-      body: bodyMain(),
+      body: bodyMain(context),
       bottomNavigationBar: bottomNavigator(context),
     );
   }
 }
 
-Container bodyMain() {
+Container bodyMain(context) {
+  SQLFlite sqlFlite = SQLFlite();
+  sqlFlite.listInit();
+  List<Note> notes = sqlFlite.notes;
+
   return Container(
     color: Colors.black,
     child: ListView.builder(
       padding: EdgeInsets.all(3),
-      itemCount: 15,
+      itemCount: notes.length,
       itemBuilder: (context, index){
-        return ListItemNotes('Teste', 'Apenas mais um teste qualquer');
+        return ListItemNotes(notes[index]);
       },
     ),
 
