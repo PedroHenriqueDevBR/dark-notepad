@@ -39,12 +39,14 @@ class SQLFlite {
     return response;
   }
 
-  getAllNotes() async {
+  getAllNotes({bool orderDefault}) async {
     Database db = await _openDataBase();
 
-    String sql = "SELECT * FROM note ORDER BY id DESC";
-    List notes = await db.rawQuery(sql);
+    String order = ';';
+    if (orderDefault == true) { order = ' ORDER BY id DESC;'; }
+    String sql = "SELECT * FROM note" + order;
 
+    List notes = await db.rawQuery(sql);
     List<Note> responseNotes = [];
     for (var note in notes) {
       Note noteItem = Note(note['title'], note['description'], id: note['id']);
@@ -58,7 +60,7 @@ class SQLFlite {
     Database db = await _openDataBase();
 
     String sql = "SELECT * FROM note where id = $id";
-    List notes = await db.query(sql);
+    List notes = await db.rawQuery(sql);
 
     List<Note> responseNotes = [];
     for (var note in notes) {
@@ -76,6 +78,26 @@ class SQLFlite {
       'note',
       where: 'id = ?',
       whereArgs: [id]
+    );
+  }
+
+  updateNoteOfID(int id, {String title, String description}) async {
+    Database db = await _openDataBase();
+
+    Map<String, dynamic> dataNote = {};
+
+    if (title != null) {
+      dataNote['title'] = title;
+    }
+    if (description != null) {
+      dataNote['description'] = description;
+    }
+
+    db.update(
+      'note',
+      dataNote,
+      where: 'id = ?',
+      whereArgs: [id],
     );
   }
 

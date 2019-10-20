@@ -4,15 +4,52 @@ import 'package:dolar_agora/views/ShowNoteActivity.dart';
 import 'package:flutter/material.dart';
 
 class CreateNoteActivity extends StatefulWidget {
+
+  int idNote = null;
+  CreateNoteActivity({this.idNote});
+
   @override
-  _CreateNoteActivityState createState() => _CreateNoteActivityState();
+  _CreateNoteActivityState createState() => _CreateNoteActivityState(idNote);
 }
 
 class _CreateNoteActivityState extends State<CreateNoteActivity> {
+  int _noteId;
+
+  _CreateNoteActivityState(this._noteId);
 
   TextEditingController _txtTitle = TextEditingController();
   TextEditingController _txtDescription= TextEditingController();
-  int _noteId = -1;
+  bool _visible = false;
+
+  loadData() async {
+    if (_noteId != null) {
+      SQLFlite sqlFlite = SQLFlite();
+      Note response = await sqlFlite.getNoteOfID(_noteId);
+
+      _txtTitle.text = response.title;
+      _txtDescription.text = response.description;
+
+      setState(() {
+        _visible = true;
+      });
+    }
+  }
+
+  _createNote() async {
+    SQLFlite sqlFlite = SQLFlite();
+
+    if (_noteId == null) {
+      Note note = Note(_txtTitle.text, _txtDescription.text);
+      int response = await sqlFlite.addNote(note);
+
+      setState(() {
+        _noteId = response;
+        _visible = true;
+      });
+    } else {
+      sqlFlite.updateNoteOfID(_noteId, title: _txtTitle.text, description: _txtDescription.text);
+    }
+  }
 
   void _viewMarkdown() {
     Navigator.push(
@@ -23,23 +60,16 @@ class _CreateNoteActivityState extends State<CreateNoteActivity> {
     );
   }
 
-  _createNote() async {
-    SQLFlite sqlFlite = SQLFlite();
-    Note note = Note(_txtTitle.text, _txtDescription.text);
-    int response = await sqlFlite.addNote(note);
-    _noteId = response;
-    print('Nota criada com sucesso $response');
+  @override
+  void initState() {
+    loadData();
+    super.initState();
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       appBar: appBarNavigator(),
-
 
       body: Container(
         width: MediaQuery.of(context).size.width,
@@ -75,7 +105,7 @@ class _CreateNoteActivityState extends State<CreateNoteActivity> {
                 cursorColor: Colors.grey[200],
                 keyboardType: TextInputType.multiline,
                 expands: false,
-                minLines: 1,
+                minLines: 30,
                 maxLines: null,
                 controller: _txtDescription,
                 style: TextStyle(
@@ -104,25 +134,28 @@ class _CreateNoteActivityState extends State<CreateNoteActivity> {
         child: Padding(
           padding: EdgeInsets.only(left: 8, right: 8),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
 
-              FlatButton.icon(
-                icon: Icon(
-                  Icons.rate_review,
-                  color: Colors.white,
-                ),
-                label: Text(
-                  'Visualizar nota ',
-                  style: TextStyle(
-                      color: Colors.white
+              Visibility(
+                visible: _visible,
+                child: FlatButton.icon(
+                  icon: Icon(
+                    Icons.rate_review,
+                    color: Colors.white,
                   ),
+                  label: Text(
+                    'Visualizar nota ',
+                    style: TextStyle(
+                        color: Colors.white
+                    ),
+                  ),
+                  color: Colors.blueGrey[700],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  onPressed: _viewMarkdown,
                 ),
-                color: Colors.blueGrey[700],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                onPressed: _viewMarkdown,
               ),
 
               FlatButton.icon(

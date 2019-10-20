@@ -1,4 +1,5 @@
 import 'package:dolar_agora/models/Note.dart';
+import 'package:dolar_agora/views/CreateNoteActivity.dart';
 import 'package:flutter/material.dart';
 
 import 'ShowNoteActivity.dart';
@@ -18,11 +19,20 @@ class _ListItemNotesState extends State<ListItemNotes> {
   Widget build(BuildContext context) {
     Note _note = widget.note;
 
-    _showNote(index) {
+    _showNote(int index) {
       Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => ShowNoteActivity(index)
+          )
+      );
+    }
+
+    _editNote(int index) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => CreateNoteActivity(idNote: index,)
           )
       );
     }
@@ -51,6 +61,15 @@ class _ListItemNotesState extends State<ListItemNotes> {
                   color: Colors.white,
                 ),
               ),
+            ),
+            trailing: IconButton(
+                icon: Icon(
+                    Icons.edit,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  _editNote(_note.id);
+                }
             ),
             onTap: () {
               _showNote(_note.id);

@@ -16,6 +16,25 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 
   List<Note> notes = [];
+  bool _orderDesc = false;
+  IconData _iconOrder = Icons.arrow_downward;
+
+  _orderList() {
+    IconData icon;
+
+    setState(() {
+      _orderDesc = !_orderDesc;
+      getNotesFromDatabase();
+
+      if (_orderDesc == true) {
+        icon = Icons.arrow_upward;
+      } else {
+        icon = Icons.arrow_downward;
+      }
+      _iconOrder = icon;
+
+    });
+  }
 
   @override
   void initState() {
@@ -26,11 +45,23 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBarNavigator(),
+      appBar: AppBar(
+        backgroundColor: Colors.blueGrey[900],
+        title: Text('Notas'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              _iconOrder,
+              color: Colors.white,
+            ),
+            onPressed: _orderList,
+          )
+        ],
+      ),
       body: Container(
         color: Colors.black,
         child: ListView.builder(
-          padding: EdgeInsets.all(3),
+          padding: EdgeInsets.all(4),
           itemCount: notes.length,
           itemBuilder: createItemList,
         ),
@@ -44,7 +75,7 @@ class _HomeState extends State<Home> {
 
   getNotesFromDatabase() async {
     SQLFlite sqlFlite = SQLFlite();
-    List<Note> response = await sqlFlite.getAllNotes();
+    List<Note> response = await sqlFlite.getAllNotes(orderDefault: _orderDesc);
 
     setState(() {
       notes = response;
@@ -61,28 +92,17 @@ class _HomeState extends State<Home> {
     return Dismissible(
       key: Key('${notes[index].id}'),
       child: ListItemNotes(notes[index]),
+      direction: DismissDirection.startToEnd,
 
       background: Container(
+        color: Colors.red,
         padding: EdgeInsets.all(16),
+        margin: EdgeInsets.symmetric(vertical: 4),
         child: Row(
           children: <Widget>[
             Icon(
               Icons.delete,
-              color: Colors.redAccent,
-              size: 30,
-            )
-          ],
-        ),
-      ),
-
-      secondaryBackground: Container(
-        padding: EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            Icon(
-              Icons.edit,
-              color: Colors.lightBlueAccent,
+              color: Colors.white,
               size: 30,
             )
           ],
@@ -93,31 +113,12 @@ class _HomeState extends State<Home> {
         print('Direction: $direction');
 
         if (direction == DismissDirection.startToEnd) {
-          print('Deletar objeto');
           deleteNote(notes[index].id);
-        } else if (direction == DismissDirection.endToStart) {
-          print('Editar objeto');
         }
       },
     );
   }
 
-}
-
-AppBar appBarNavigator() {
-  return AppBar(
-    backgroundColor: Colors.blueGrey[900],
-    title: Text('Notas'),
-    actions: <Widget>[
-      IconButton(
-        icon: Icon(
-          Icons.filter_list,
-          color: Colors.white,
-        ),
-        onPressed: () {},
-      )
-    ],
-  );
 }
 
 BottomAppBar bottomNavigator(context) {
@@ -207,8 +208,8 @@ Widget _BottomDrawer(context) {
             ),
           ),
           SizedBox(height: 8,),
-          ListItemConfiguration(Icons.color_lens, 'Alterar cor principal',
-              'Alterar a cor principal da aplicacao, cor dos itens e da barra de configuraçao'),
+//          ListItemConfiguration(Icons.color_lens, 'Alterar cor principal',
+//              'Alterar a cor principal da aplicacao, cor dos itens e da barra de configuraçao'),
           ListItemConfiguration(Icons.library_books, 'Markdown',
               'Manual markdown, aprenda markdown e otimize as suas anotaçoes'),
           ListItemConfiguration(Icons.share, 'Compartilhar',
@@ -217,4 +218,10 @@ Widget _BottomDrawer(context) {
       ),
     ),
   );
+
+
+//  Future<Null> _openMarkdownDocumentation() async {
+//    String url = 'https://docs.microsoft.com/pt-br/contribute/how-to-write-use-markdown';
+//    if (await url_la)
+//  }
 }
