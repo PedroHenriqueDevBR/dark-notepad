@@ -210,18 +210,12 @@ Widget _BottomDrawer(context) {
           SizedBox(height: 8,),
 //          ListItemConfiguration(Icons.color_lens, 'Alterar cor principal',
 //              'Alterar a cor principal da aplicacao, cor dos itens e da barra de configuraçao'),
-          ListItemConfiguration(Icons.library_books, 'Markdown',
+          ListItemConfiguration(context, Icons.library_books, 'Markdown',
               'Manual markdown, aprenda markdown e otimize as suas anotaçoes'),
-          ListItemConfiguration(Icons.share, 'Compartilhar',
+          ListItemConfiguration(context, Icons.share, 'Compartilhar',
               'Ajude a manter a aplicaçao funcionando, compartilhe com os seus amigos'),
         ],
       ),
     ),
   );
-
-
-//  Future<Null> _openMarkdownDocumentation() async {
-//    String url = 'https://docs.microsoft.com/pt-br/contribute/how-to-write-use-markdown';
-//    if (await url_la)
-//  }
 }
