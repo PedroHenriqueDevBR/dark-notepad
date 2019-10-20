@@ -5,8 +5,8 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 
 class ShowNoteActivity extends StatefulWidget {
 
-  Note _note;
-  ShowNoteActivity(this._note);
+  int _noteId;
+  ShowNoteActivity(this._noteId);
 
   @override
   _ShowNoteActivityState createState() => _ShowNoteActivityState();
@@ -18,14 +18,14 @@ class _ShowNoteActivityState extends State<ShowNoteActivity> {
   @override
   Widget build(BuildContext context) {
 
-    Note note = widget._note;
+    Note _note = Note('teste', 'Mais um teste.');
 
     return Scaffold(
-      appBar: appBarNavigator(widget._note.title),
+      appBar: appBarNavigator(_note.title),
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        child: bodyMain(note),
+        child: bodyMain(_note.description),
       ),
     );
   }

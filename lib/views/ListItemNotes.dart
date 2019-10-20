@@ -16,7 +16,7 @@ class ListItemNotes extends StatelessWidget {
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => ShowNoteActivity(_note)
+              builder: (context) => ShowNoteActivity(1)
           )
       );
     }

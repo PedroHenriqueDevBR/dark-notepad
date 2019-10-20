@@ -26,9 +26,13 @@ class _HomeState extends State<Home> {
 }
 
 Container bodyMain(context) {
-  SQLFlite sqlFlite = SQLFlite();
-  sqlFlite.listInit();
-  List<Note> notes = sqlFlite.notes;
+
+  Future<List<Note>> getNotesFromDatabase() async {
+    SQLFlite sqlFlite = SQLFlite();
+    List<Note> response = await sqlFlite.getAllNotes();
+    return response;
+  }
+  List<Note> notes = [];
 
   return Container(
     color: Colors.black,
