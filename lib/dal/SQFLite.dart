@@ -58,7 +58,7 @@ class SQLFlite {
     Database db = await _openDataBase();
 
     String sql = "SELECT * FROM note where id = $id";
-    List notes = await db.rawQuery(sql);
+    List notes = await db.query(sql);
 
     List<Note> responseNotes = [];
     for (var note in notes) {
@@ -66,6 +66,17 @@ class SQLFlite {
       responseNotes.add(noteItem);
     }
     return responseNotes[0];
+  }
+
+  deleteNoteOfID(int id) async {
+    Database db = await _openDataBase();
+    String sql = "DELETE FROM note where id = $id";
+
+    db.delete(
+      'note',
+      where: 'id = ?',
+      whereArgs: [id]
+    );
   }
 
 }

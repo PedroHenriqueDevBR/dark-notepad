@@ -13,18 +13,9 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with WidgetsBindingObserver {
+class _HomeState extends State<Home> {
 
   List<Note> notes = [];
-
-  getNotesFromDatabase() async {
-    SQLFlite sqlFlite = SQLFlite();
-    List<Note> response = await sqlFlite.getAllNotes();
-
-    setState(() {
-      notes = response;
-    });
-  }
 
   @override
   void initState() {
@@ -41,57 +32,76 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
         child: ListView.builder(
           padding: EdgeInsets.all(3),
           itemCount: notes.length,
-          itemBuilder: (context, index){
-            print(notes[index].id);
-            return Dismissible(
-              key: Key('${notes[index].id}'),
-              child: ListItemNotes(notes[index]),
-
-              background: Container(
-                padding: EdgeInsets.all(16),
-                child: Row(
-                  children: <Widget>[
-                    Icon(
-                      Icons.delete,
-                      color: Colors.redAccent,
-                      size: 30,
-                    )
-                  ],
-                ),
-              ),
-
-              secondaryBackground: Container(
-                padding: EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    Icon(
-                      Icons.edit,
-                      color: Colors.lightBlueAccent,
-                      size: 30,
-                    )
-                  ],
-                ),
-              ),
-
-              onDismissed: (direction) {
-                print('Direction: $direction');
-                
-                if (direction == DismissDirection.startToEnd) {
-                  print('Deletar objeto');
-                } else if (direction == DismissDirection.endToStart) {
-                  print('Editar objeto');
-                }
-              },
-            );
-
-
-          },
+          itemBuilder: createItemList,
         ),
       ),
       bottomNavigationBar: bottomNavigator(context),
     );
   }
+
+
+  // Operaçoes de banco de dados
+
+  getNotesFromDatabase() async {
+    SQLFlite sqlFlite = SQLFlite();
+    List<Note> response = await sqlFlite.getAllNotes();
+
+    setState(() {
+      notes = response;
+    });
+  }
+
+  deleteNote(int id) async {
+    SQLFlite sqlFlite = SQLFlite();
+    sqlFlite.deleteNoteOfID(id);
+    getNotesFromDatabase();
+  }
+
+  Widget createItemList(context, index) {
+    return Dismissible(
+      key: Key('${notes[index].id}'),
+      child: ListItemNotes(notes[index]),
+
+      background: Container(
+        padding: EdgeInsets.all(16),
+        child: Row(
+          children: <Widget>[
+            Icon(
+              Icons.delete,
+              color: Colors.redAccent,
+              size: 30,
+            )
+          ],
+        ),
+      ),
+
+      secondaryBackground: Container(
+        padding: EdgeInsets.all(16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            Icon(
+              Icons.edit,
+              color: Colors.lightBlueAccent,
+              size: 30,
+            )
+          ],
+        ),
+      ),
+
+      onDismissed: (direction) {
+        print('Direction: $direction');
+
+        if (direction == DismissDirection.startToEnd) {
+          print('Deletar objeto');
+          deleteNote(notes[index].id);
+        } else if (direction == DismissDirection.endToStart) {
+          print('Editar objeto');
+        }
+      },
+    );
+  }
+
 }
 
 AppBar appBarNavigator() {
@@ -104,7 +114,7 @@ AppBar appBarNavigator() {
           Icons.filter_list,
           color: Colors.white,
         ),
-        onPressed: (){},
+        onPressed: () {},
       )
     ],
   );
@@ -113,10 +123,10 @@ AppBar appBarNavigator() {
 BottomAppBar bottomNavigator(context) {
   void _createNote() {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => CreateNoteActivity()
-        ),
+      context,
+      MaterialPageRoute(
+          builder: (context) => CreateNoteActivity()
+      ),
     );
   }
 
@@ -131,13 +141,13 @@ BottomAppBar bottomNavigator(context) {
 
           FlatButton.icon(
             icon: Icon(
-                Icons.add,
+              Icons.add,
               color: Colors.white,
             ),
             label: Text(
-                'Criar nota',
+              'Criar nota',
               style: TextStyle(
-                color: Colors.white
+                  color: Colors.white
               ),
             ),
             color: Colors.blueGrey[700],
@@ -149,19 +159,19 @@ BottomAppBar bottomNavigator(context) {
 
           FlatButton.icon(
             icon: Icon(
-                Icons.list,
+              Icons.list,
               color: Colors.white,
             ),
             label: Text(''),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
-            onPressed: (){
+            onPressed: () {
               showModalBottomSheet<Null>(
-                context: context,
-                builder: (BuildContext context){
-                  return _BottomDrawer(context);
-                }
+                  context: context,
+                  builder: (BuildContext context) {
+                    return _BottomDrawer(context);
+                  }
               );
             },
           ),
@@ -173,7 +183,6 @@ BottomAppBar bottomNavigator(context) {
 
 
 Widget _BottomDrawer(context) {
-
   return Drawer(
     child: Container(
       color: Colors.black,
@@ -188,7 +197,7 @@ Widget _BottomDrawer(context) {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Text(
-                    'Configuraçoes',
+                  'Configuraçoes',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -198,9 +207,12 @@ Widget _BottomDrawer(context) {
             ),
           ),
           SizedBox(height: 8,),
-          ListItemConfiguration(Icons.color_lens, 'Alterar cor principal', 'Alterar a cor principal da aplicacao, cor dos itens e da barra de configuraçao'),
-          ListItemConfiguration(Icons.library_books, 'Markdown', 'Manual markdown, aprenda markdown e otimize as suas anotaçoes'),
-          ListItemConfiguration(Icons.share, 'Compartilhar', 'Ajude a manter a aplicaçao funcionando, compartilhe com os seus amigos'),
+          ListItemConfiguration(Icons.color_lens, 'Alterar cor principal',
+              'Alterar a cor principal da aplicacao, cor dos itens e da barra de configuraçao'),
+          ListItemConfiguration(Icons.library_books, 'Markdown',
+              'Manual markdown, aprenda markdown e otimize as suas anotaçoes'),
+          ListItemConfiguration(Icons.share, 'Compartilhar',
+              'Ajude a manter a aplicaçao funcionando, compartilhe com os seus amigos'),
         ],
       ),
     ),
