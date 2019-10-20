@@ -42,65 +42,30 @@ class SQLFlite {
   getAllNotes() async {
     Database db = await _openDataBase();
 
-    String sql = "SELECT * FROM note";
+    String sql = "SELECT * FROM note ORDER BY id DESC";
     List notes = await db.rawQuery(sql);
 
     List<Note> responseNotes = [];
     for (var note in notes) {
-      Note noteItem = Note(note['title'], note['description']);
+      Note noteItem = Note(note['title'], note['description'], id: note['id']);
       responseNotes.add(noteItem);
     }
 
-    print('Notas: ' + notes.toString());
     return responseNotes;
   }
 
-  listInit() {
-    for (int i = 0; i < 15; i++) {
-      this.addNote(Note('Nota $i',
-          """
-            # Markdown Example
-            Markdown allows you to easily include formatted text, images, and even formatted Dart code in your app.
-            
-            ## Styling
-            Style text as _italic_, __bold__, or `inline code`.
-            
-            - Use bulleted lists
-            - To better clarify
-            - Your points
-            
-            ## Links
-            You can use [hyperlinks](hyperlink) in markdown
-            
-            ## Images
-            
-            You can include images:
-            
-            ![Flutter logo](https://flutter.io/images/flutter-mark-square-100.png#100x100)
-            
-            ## Markdown widget
-            
-            This is an example of how to create your own Markdown widget:
-            
-                new Markdown(data: 'Hello _world_!');
-            
-            ## Code blocks
-            Formatted Dart code looks really pretty too:
-            
-            ```
-            void main() {
-              runApp(new MaterialApp(
-                home: new Scaffold(
-                  body: new Markdown(data: markdownData)
-                )
-              ));
-            }
-            ```
-            
-            Enjoy!
-          """
-      ));
+  getNoteOfID(int id) async {
+    Database db = await _openDataBase();
+
+    String sql = "SELECT * FROM note where id = $id";
+    List notes = await db.rawQuery(sql);
+
+    List<Note> responseNotes = [];
+    for (var note in notes) {
+      Note noteItem = Note(note['title'], note['description'], id: note['id']);
+      responseNotes.add(noteItem);
     }
+    return responseNotes[0];
   }
 
 }

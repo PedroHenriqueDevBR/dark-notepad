@@ -1,8 +1,9 @@
 class Note {
+  int id;
   String _title;
   String _description;
 
-  Note(this._title, this._description);
+  Note(this._title, this._description, {this.id});
 
   set title(String title) {
     this._title = title;

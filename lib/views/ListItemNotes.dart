@@ -4,50 +4,58 @@ import 'package:flutter/material.dart';
 import 'ShowNoteActivity.dart';
 
 
-class ListItemNotes extends StatelessWidget {
-  Note _note;
+class ListItemNotes extends StatefulWidget {
+  Note note;
+  ListItemNotes(this.note);
 
-  ListItemNotes(this._note);
+  @override
+  _ListItemNotesState createState() => _ListItemNotesState();
+}
+
+class _ListItemNotesState extends State<ListItemNotes> {
 
   @override
   Widget build(BuildContext context) {
+    Note _note = widget.note;
 
-    _showNote() {
+    _showNote(index) {
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => ShowNoteActivity(1)
+              builder: (context) => ShowNoteActivity(index)
           )
       );
     }
 
     return Card(
-      elevation: 0,
-      color: Colors.deepPurpleAccent,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: ListTile(
-        title: Text(
-          this._note.title,
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            textBaseline: TextBaseline.alphabetic
+          elevation: 0,
+          color: Colors.deepPurpleAccent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5),
           ),
-        ),
-        subtitle: Container(
-          padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-          child: Text(
-            this._note.description,
-            maxLines: 9,
-            style: TextStyle(
-            color: Colors.white,
+          child: ListTile(
+            title: Text(
+              _note.title,
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  textBaseline: TextBaseline.alphabetic
+              ),
             ),
+            subtitle: Container(
+              padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+              child: Text(
+                _note.description,
+                maxLines: 9,
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            onTap: () {
+              _showNote(_note.id);
+            },
           ),
-        ),
-        onTap: _showNote,
-      ),
     );
   }
 }

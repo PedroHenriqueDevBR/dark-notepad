@@ -1,10 +1,10 @@
+import 'package:dolar_agora/dal/SQFLite.dart';
 import 'package:dolar_agora/models/Note.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
 
 class ShowNoteActivity extends StatefulWidget {
-
   int _noteId;
   ShowNoteActivity(this._noteId);
 
@@ -14,18 +14,31 @@ class ShowNoteActivity extends StatefulWidget {
 
 
 class _ShowNoteActivityState extends State<ShowNoteActivity> {
+  Note _note = Note('', '');
+
+  void selectNoteFromDatabase() async {
+    SQLFlite sqlFlite = SQLFlite();
+    Note response = await sqlFlite.getNoteOfID(widget._noteId);
+
+    setState(() {
+      _note = response;
+    });
+  }
+
+  @override
+  void initState() {
+    selectNoteFromDatabase();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-
-    Note _note = Note('teste', 'Mais um teste.');
-
     return Scaffold(
-      appBar: appBarNavigator(_note.title),
+      appBar: appBarNavigator(_note),
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        child: bodyMain(_note.description),
+        child: bodyMain(_note),
       ),
     );
   }
@@ -41,10 +54,10 @@ Scrollbar bodyMain(Note note) {
 }
 
 
-AppBar appBarNavigator(String titleBar) {
+AppBar appBarNavigator(Note note) {
   return AppBar(
     backgroundColor: Colors.blueGrey[900],
     elevation: 0,
-    title: Text(titleBar),
+    title: Text(note.title),
   );
 }

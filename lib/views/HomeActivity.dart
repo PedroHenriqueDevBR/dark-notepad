@@ -2,7 +2,6 @@ import 'package:dolar_agora/dal/SQFLite.dart';
 import 'package:dolar_agora/models/Note.dart';
 import 'package:dolar_agora/views/ListItemConfiguration.dart';
 import 'package:dolar_agora/views/ListItemNotes.dart';
-import 'package:dolar_agora/views/ShowNoteActivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -14,37 +13,85 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with WidgetsBindingObserver {
+
+  List<Note> notes = [];
+
+  getNotesFromDatabase() async {
+    SQLFlite sqlFlite = SQLFlite();
+    List<Note> response = await sqlFlite.getAllNotes();
+
+    setState(() {
+      notes = response;
+    });
+  }
+
+  @override
+  void initState() {
+    getNotesFromDatabase();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBarNavigator(),
-      body: bodyMain(context),
+      body: Container(
+        color: Colors.black,
+        child: ListView.builder(
+          padding: EdgeInsets.all(3),
+          itemCount: notes.length,
+          itemBuilder: (context, index){
+            print(notes[index].id);
+            return Dismissible(
+              key: Key('${notes[index].id}'),
+              child: ListItemNotes(notes[index]),
+
+              background: Container(
+                padding: EdgeInsets.all(16),
+                child: Row(
+                  children: <Widget>[
+                    Icon(
+                      Icons.delete,
+                      color: Colors.redAccent,
+                      size: 30,
+                    )
+                  ],
+                ),
+              ),
+
+              secondaryBackground: Container(
+                padding: EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Icon(
+                      Icons.edit,
+                      color: Colors.lightBlueAccent,
+                      size: 30,
+                    )
+                  ],
+                ),
+              ),
+
+              onDismissed: (direction) {
+                print('Direction: $direction');
+                
+                if (direction == DismissDirection.startToEnd) {
+                  print('Deletar objeto');
+                } else if (direction == DismissDirection.endToStart) {
+                  print('Editar objeto');
+                }
+              },
+            );
+
+
+          },
+        ),
+      ),
       bottomNavigationBar: bottomNavigator(context),
     );
   }
-}
-
-Container bodyMain(context) {
-
-  Future<List<Note>> getNotesFromDatabase() async {
-    SQLFlite sqlFlite = SQLFlite();
-    List<Note> response = await sqlFlite.getAllNotes();
-    return response;
-  }
-  List<Note> notes = [];
-
-  return Container(
-    color: Colors.black,
-    child: ListView.builder(
-      padding: EdgeInsets.all(3),
-      itemCount: notes.length,
-      itemBuilder: (context, index){
-        return ListItemNotes(notes[index]);
-      },
-    ),
-
-  );
 }
 
 AppBar appBarNavigator() {
