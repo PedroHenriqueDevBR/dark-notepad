@@ -19,7 +19,8 @@ class _CreateNoteActivityState extends State<CreateNoteActivity> {
 
   TextEditingController _txtTitle = TextEditingController();
   TextEditingController _txtDescription= TextEditingController();
-  bool _visible = false;
+  String _titleText = '';
+//  bool _visible = false;
 
   loadData() async {
     if (_noteId != null) {
@@ -30,12 +31,13 @@ class _CreateNoteActivityState extends State<CreateNoteActivity> {
       _txtDescription.text = response.description;
 
       setState(() {
-        _visible = true;
+//        _visible = true;
+        _titleText = _txtTitle.text;
       });
     }
   }
 
-  _createNote() async {
+  dynamic _createNote() async {
     SQLFlite sqlFlite = SQLFlite();
 
     if (_noteId == null) {
@@ -44,20 +46,28 @@ class _CreateNoteActivityState extends State<CreateNoteActivity> {
 
       setState(() {
         _noteId = response;
-        _visible = true;
+//        _visible = true;
       });
     } else {
       sqlFlite.updateNoteOfID(_noteId, title: _txtTitle.text, description: _txtDescription.text);
     }
+
+    setState(() {
+      _titleText = _txtTitle.text;
+    });
   }
 
   void _viewMarkdown() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => ShowNoteActivity(_noteId)
-      ),
-    );
+    if (_noteId == null) {
+      print('Nenhum dado para ser apresentado.');
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ShowNoteActivity(_noteId)
+        ),
+      );
+    }
   }
 
   @override
@@ -69,7 +79,11 @@ class _CreateNoteActivityState extends State<CreateNoteActivity> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBarNavigator(),
+      appBar: AppBar(
+        title: Text(_titleText),
+        backgroundColor: Colors.blueGrey[900],
+        elevation: 0,
+      ),
 
       body: Container(
         width: MediaQuery.of(context).size.width,
@@ -99,6 +113,9 @@ class _CreateNoteActivityState extends State<CreateNoteActivity> {
                   ),
                   border: InputBorder.none,
                 ),
+                onChanged: (text) {
+                  _createNote();
+                },
               ),
               SizedBox(height: 10,),
               TextFormField(
@@ -118,6 +135,9 @@ class _CreateNoteActivityState extends State<CreateNoteActivity> {
                     color: Colors.grey,
                   ),
                 ),
+                onChanged: (text) {
+                  _createNote();
+                },
               ),
             ],
           ),
@@ -125,69 +145,67 @@ class _CreateNoteActivityState extends State<CreateNoteActivity> {
       ),
 
 
-
-
-
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.blueGrey[900],
-        elevation: 15,
-        child: Padding(
-          padding: EdgeInsets.only(left: 8, right: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-
-              Visibility(
-                visible: _visible,
-                child: FlatButton.icon(
-                  icon: Icon(
-                    Icons.rate_review,
-                    color: Colors.white,
-                  ),
-                  label: Text(
-                    'Visualizar nota ',
-                    style: TextStyle(
-                        color: Colors.white
-                    ),
-                  ),
-                  color: Colors.blueGrey[700],
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  onPressed: _viewMarkdown,
-                ),
-              ),
-
-              FlatButton.icon(
-                icon: Icon(
-                  Icons.save_alt,
-                  color: Colors.white,
-                ),
-                label: Text(
-                  'Salvar progresso',
-                  style: TextStyle(
-                      color: Colors.white
-                  ),
-                ),
-                color: Colors.green[700],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                onPressed: _createNote,
-              ),
-
-            ],
-          ),
-        ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _viewMarkdown,
+        icon: Icon(Icons.code),
+        label: Text('View'),
+        backgroundColor: Colors.purple,
       ),
+
+      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
+
+//      bottomNavigationBar: BottomAppBar(
+//        color: Colors.blueGrey[900],
+//        elevation: 15,
+//        child: Padding(
+//          padding: EdgeInsets.only(left: 8, right: 8),
+//          child: Row(
+//            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//            children: <Widget>[
+//
+//              Visibility(
+//                visible: _visible,
+//                child: FlatButton.icon(
+//                  icon: Icon(
+//                    Icons.rate_review,
+//                    color: Colors.white,
+//                  ),
+//                  label: Text(
+//                    'Visualizar nota ',
+//                    style: TextStyle(
+//                        color: Colors.white
+//                    ),
+//                  ),
+//                  color: Colors.blueGrey[700],
+//                  shape: RoundedRectangleBorder(
+//                    borderRadius: BorderRadius.circular(16),
+//                  ),
+//                  onPressed: _viewMarkdown,
+//                ),
+//              ),
+//
+//              FlatButton.icon(
+//                icon: Icon(
+//                  Icons.save_alt,
+//                  color: Colors.white,
+//                ),
+//                label: Text(
+//                  'Salvar progresso',
+//                  style: TextStyle(
+//                      color: Colors.white
+//                  ),
+//                ),
+//                color: Colors.green[700],
+//                shape: RoundedRectangleBorder(
+//                  borderRadius: BorderRadius.circular(16),
+//                ),
+//                onPressed: _createNote,
+//              ),
+//
+//            ],
+//          ),
+//        ),
+//      ),
     );
   }
-}
-
-
-AppBar appBarNavigator() {
-  return AppBar(
-    backgroundColor: Colors.blueGrey[900],
-    elevation: 0,
-  );
 }
