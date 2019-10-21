@@ -7,8 +7,10 @@ class ListItemConfiguration extends StatelessWidget {
   IconData _icon;
   String _title;
   String _subtitle;
+  bool _showMarkdown = false;
+  Function itemFunction;
 
-  ListItemConfiguration(this.context, this._icon, this._title, this._subtitle);
+  ListItemConfiguration(this.context, this._icon, this._title, this._subtitle, this._showMarkdown, {this.itemFunction});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,13 @@ class ListItemConfiguration extends StatelessWidget {
           color: Colors.white,
         ),
       ),
-      onTap: _openMarkdownDocumentation,
+      onTap: () {
+        if (_showMarkdown) {
+          _openMarkdownDocumentation();
+        } else {
+          itemFunction();
+        }
+      },
     );
   }
 
