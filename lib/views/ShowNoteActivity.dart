@@ -2,6 +2,7 @@ import 'package:dolar_agora/dal/SQFLite.dart';
 import 'package:dolar_agora/models/Note.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 class ShowNoteActivity extends StatefulWidget {
@@ -15,6 +16,7 @@ class ShowNoteActivity extends StatefulWidget {
 
 class _ShowNoteActivityState extends State<ShowNoteActivity> {
   Note _note = Note('', '');
+  final GlobalKey<ScaffoldState> _globalKey = GlobalKey<ScaffoldState>();
 
   void selectNoteFromDatabase() async {
     SQLFlite sqlFlite = SQLFlite();
@@ -23,6 +25,23 @@ class _ShowNoteActivityState extends State<ShowNoteActivity> {
     setState(() {
       _note = response;
     });
+  }
+
+  void _onTapLink(url) async {
+    if (await canLaunch(url)) {
+      _globalKey.currentState.showSnackBar(
+          SnackBar(
+            content: Text('Impossivel carregar pagina da web'),
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.fixed,
+            backgroundColor: Colors.black,
+            elevation: 5,
+          )
+      );
+
+    } else {
+      launch(url);
+    }
   }
 
   @override
@@ -34,25 +53,21 @@ class _ShowNoteActivityState extends State<ShowNoteActivity> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _globalKey,
       appBar: appBarNavigator(_note),
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        child: bodyMain(_note),
+        child: Scrollbar(
+            child: Markdown(
+              data: _note.description,
+              onTapLink: _onTapLink,
+            )
+        ),
       ),
     );
   }
 }
-
-
-Scrollbar bodyMain(Note note) {
-  return Scrollbar(
-      child: Markdown(
-        data: note.description,
-      )
-  );
-}
-
 
 AppBar appBarNavigator(Note note) {
   return AppBar(

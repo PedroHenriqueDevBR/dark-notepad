@@ -1,12 +1,12 @@
 import 'package:dolar_agora/dal/SQFLite.dart';
 import 'package:dolar_agora/models/Note.dart';
 import 'package:dolar_agora/views/ListItemConfiguration.dart';
-import 'package:dolar_agora/views/ListItemNotes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
-import 'CreateNoteActivity.dart';
+import 'package:share/share.dart';
 
+import 'CreateNoteActivity.dart';
+import 'ShowNoteActivity.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -14,38 +14,10 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
   List<Note> notes = [];
   bool _orderDesc = false;
   IconData _iconOrder = Icons.arrow_downward;
-
-  _orderList() {
-    IconData icon;
-
-    setState(() {
-      _orderDesc = !_orderDesc;
-      getNotesFromDatabase();
-
-      if (_orderDesc == true) {
-        icon = Icons.arrow_upward;
-      } else {
-        icon = Icons.arrow_downward;
-      }
-      _iconOrder = icon;
-
-    });
-  }
-
-  void _createNote() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => CreateNoteActivity()
-      ),
-    ).then((value) {
-      getNotesFromDatabase();
-    });
-  }
+  GlobalKey<ScaffoldState> _globalKey = new GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -56,6 +28,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _globalKey,
       appBar: AppBar(
         backgroundColor: Colors.blueGrey[900],
         title: Text('Notas'),
@@ -85,7 +58,6 @@ class _HomeState extends State<Home> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-
               FlatButton.icon(
                 icon: Icon(
                   Icons.add,
@@ -93,9 +65,7 @@ class _HomeState extends State<Home> {
                 ),
                 label: Text(
                   'Criar nota',
-                  style: TextStyle(
-                      color: Colors.white
-                  ),
+                  style: TextStyle(color: Colors.white),
                 ),
                 color: Colors.blueGrey[700],
                 shape: RoundedRectangleBorder(
@@ -103,7 +73,6 @@ class _HomeState extends State<Home> {
                 ),
                 onPressed: _createNote,
               ),
-
               FlatButton.icon(
                 icon: Icon(
                   Icons.list,
@@ -118,8 +87,7 @@ class _HomeState extends State<Home> {
                       context: context,
                       builder: (BuildContext context) {
                         return _BottomDrawer(context);
-                      }
-                  );
+                      });
                 },
               ),
             ],
@@ -129,13 +97,52 @@ class _HomeState extends State<Home> {
     );
   }
 
+  _orderList() {
+    IconData icon;
+
+    setState(() {
+      _orderDesc = !_orderDesc;
+      getNotesFromDatabase();
+
+      if (_orderDesc == true) {
+        icon = Icons.arrow_upward;
+      } else {
+        icon = Icons.arrow_downward;
+      }
+      _iconOrder = icon;
+    });
+  }
+
+  _createNote() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CreateNoteActivity()),
+    ).then((value) {
+      getNotesFromDatabase();
+    });
+  }
+
+  _showNote(int index) {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => ShowNoteActivity(index)));
+  }
+
+  _editNote(int index) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => CreateNoteActivity(
+                  idNote: index,
+                ))).then((value) {
+      getNotesFromDatabase();
+    });
+  }
 
   // Operaçoes de banco de dados
 
   getNotesFromDatabase() async {
     SQLFlite sqlFlite = SQLFlite();
     List<Note> response = await sqlFlite.getAllNotes(orderDefault: _orderDesc);
-
     setState(() {
       notes = response;
     });
@@ -145,14 +152,24 @@ class _HomeState extends State<Home> {
     SQLFlite sqlFlite = SQLFlite();
     sqlFlite.deleteNoteOfID(id);
     getNotesFromDatabase();
+
+    _globalKey.currentState.showSnackBar(
+      SnackBar(
+        content: Text('Nota deletada.'),
+        duration: Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.deepPurple,
+      )
+    );
+
   }
 
   Widget createItemList(context, index) {
+    Note _note = notes[index];
+
     return Dismissible(
       key: Key('${notes[index].id}'),
-      child: ListItemNotes(notes[index]),
       direction: DismissDirection.startToEnd,
-
       background: Container(
         color: Colors.red,
         padding: EdgeInsets.all(16),
@@ -167,7 +184,6 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
-
       onDismissed: (direction) {
         print('Direction: $direction');
 
@@ -175,18 +191,52 @@ class _HomeState extends State<Home> {
           deleteNote(notes[index].id);
         }
       },
+      child: Card(
+        elevation: 0,
+        color: Colors.deepPurpleAccent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: ListTile(
+          title: Text(
+            _note.title,
+            style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                textBaseline: TextBaseline.alphabetic),
+          ),
+          subtitle: Container(
+            padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+            child: Text(
+              _note.description,
+              maxLines: 9,
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+          ),
+          trailing: IconButton(
+              icon: Icon(
+                Icons.edit,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                _editNote(_note.id);
+              }),
+          onTap: () {
+            _showNote(_note.id);
+          },
+        ),
+      ),
     );
   }
-
 }
 
 BottomAppBar bottomNavigator(context) {
   void _createNote() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-          builder: (context) => CreateNoteActivity()
-      ),
+      MaterialPageRoute(builder: (context) => CreateNoteActivity()),
     ).then((value) {
       ;
     });
@@ -200,7 +250,6 @@ BottomAppBar bottomNavigator(context) {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-
           FlatButton.icon(
             icon: Icon(
               Icons.add,
@@ -208,9 +257,7 @@ BottomAppBar bottomNavigator(context) {
             ),
             label: Text(
               'Criar nota',
-              style: TextStyle(
-                  color: Colors.white
-              ),
+              style: TextStyle(color: Colors.white),
             ),
             color: Colors.blueGrey[700],
             shape: RoundedRectangleBorder(
@@ -218,7 +265,6 @@ BottomAppBar bottomNavigator(context) {
             ),
             onPressed: _createNote,
           ),
-
           FlatButton.icon(
             icon: Icon(
               Icons.list,
@@ -233,8 +279,7 @@ BottomAppBar bottomNavigator(context) {
                   context: context,
                   builder: (BuildContext context) {
                     return _BottomDrawer(context);
-                  }
-              );
+                  });
             },
           ),
         ],
@@ -243,11 +288,9 @@ BottomAppBar bottomNavigator(context) {
   );
 }
 
-
 Widget _BottomDrawer(context) {
-
   void shareApp() {
-    print('Compartilhar aplicativo.');
+    Share.share('Acesse meu perfil no Github https://github.com/pedrohenriquedevbr');
   }
 
   return Drawer(
@@ -273,13 +316,24 @@ Widget _BottomDrawer(context) {
               ],
             ),
           ),
-          SizedBox(height: 8,),
+          SizedBox(
+            height: 8,
+          ),
 //          ListItemConfiguration(Icons.color_lens, 'Alterar cor principal',
 //              'Alterar a cor principal da aplicacao, cor dos itens e da barra de configuraçao'),
-          ListItemConfiguration(context, Icons.library_books, 'Markdown',
-              'Manual markdown, aprenda markdown e otimize as suas anotaçoes', true),
-          ListItemConfiguration(context, Icons.share, 'Compartilhar',
-              'Ajude a manter a aplicaçao funcionando, compartilhe com os seus amigos', false, itemFunction: shareApp),
+          ListItemConfiguration(
+              context,
+              Icons.library_books,
+              'Markdown',
+              'Manual markdown, aprenda markdown e otimize as suas anotaçoes',
+              true),
+          ListItemConfiguration(
+              context,
+              Icons.share,
+              'Compartilhar',
+              'Ajude a manter a aplicaçao funcionando, compartilhe com os seus amigos',
+              false,
+              itemFunction: shareApp),
         ],
       ),
     ),

@@ -13,14 +13,14 @@ class CreateNoteActivity extends StatefulWidget {
 }
 
 class _CreateNoteActivityState extends State<CreateNoteActivity> {
+  //  bool _visible = false;
   int _noteId;
-
-  _CreateNoteActivityState(this._noteId);
-
   TextEditingController _txtTitle = TextEditingController();
   TextEditingController _txtDescription= TextEditingController();
   String _titleText = '';
-//  bool _visible = false;
+  GlobalKey<ScaffoldState> _globalKey = new GlobalKey<ScaffoldState>();
+
+  _CreateNoteActivityState(this._noteId);
 
   loadData() async {
     if (_noteId != null) {
@@ -59,7 +59,15 @@ class _CreateNoteActivityState extends State<CreateNoteActivity> {
 
   void _viewMarkdown() {
     if (_noteId == null) {
-      print('Nenhum dado para ser apresentado.');
+      _globalKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text('Nada digitado ate o momento'),
+          duration: Duration(seconds: 1),
+          elevation: 22,
+          backgroundColor: Colors.deepPurple,
+          behavior: SnackBarBehavior.fixed,
+        )
+      );
     } else {
       Navigator.push(
         context,
@@ -79,6 +87,7 @@ class _CreateNoteActivityState extends State<CreateNoteActivity> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _globalKey,
       appBar: AppBar(
         title: Text(_titleText),
         backgroundColor: Colors.blueGrey[900],
