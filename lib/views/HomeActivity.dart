@@ -31,9 +31,10 @@ class _HomeState extends State<Home> {
       key: _globalKey,
       appBar: AppBar(
         backgroundColor: Colors.blueGrey[900],
-        title: Text('Notas'),
+        title: Text('Markdown Editor'),
         actions: <Widget>[
           IconButton(
+            tooltip: 'Ordenação',
             icon: Icon(
               _iconOrder,
               color: Colors.white,
@@ -99,6 +100,7 @@ class _HomeState extends State<Home> {
 
   _orderList() {
     IconData icon;
+    String order = '';
 
     setState(() {
       _orderDesc = !_orderDesc;
@@ -106,10 +108,24 @@ class _HomeState extends State<Home> {
 
       if (_orderDesc == true) {
         icon = Icons.arrow_upward;
+        order = 'decrescente';
       } else {
         icon = Icons.arrow_downward;
+        order = 'crescente';
       }
+
       _iconOrder = icon;
+      _globalKey.currentState.showSnackBar(
+          SnackBar(
+            content: Text(
+                order,
+              textAlign: TextAlign.center,
+            ),
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.blueGrey[800],
+          )
+      );
+
     });
   }
 
@@ -185,8 +201,6 @@ class _HomeState extends State<Home> {
         ),
       ),
       onDismissed: (direction) {
-        print('Direction: $direction');
-
         if (direction == DismissDirection.startToEnd) {
           deleteNote(notes[index].id);
         }
@@ -290,7 +304,8 @@ BottomAppBar bottomNavigator(context) {
 
 Widget _BottomDrawer(context) {
   void shareApp() {
-    Share.share('Acesse meu perfil no Github https://github.com/pedrohenriquedevbr');
+    Share.share('Markdown editor, editor de markdown simples de utilizar, sem anúncios. '
+        'Baixe agora mesmo em https://play.google.com/store/apps/details?id=com.pedrohenriquedevbr.dolar_agora');
   }
 
   return Drawer(
@@ -307,7 +322,7 @@ Widget _BottomDrawer(context) {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  'Configuraçoes',
+                  'Configurações',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -325,13 +340,13 @@ Widget _BottomDrawer(context) {
               context,
               Icons.library_books,
               'Markdown',
-              'Manual markdown, aprenda markdown e otimize as suas anotaçoes',
+              'Manual markdown, aprenda markdown e otimize as suas anotações',
               true),
           ListItemConfiguration(
               context,
               Icons.share,
               'Compartilhar',
-              'Ajude a manter a aplicaçao funcionando, compartilhe com os seus amigos',
+              'Ajude a melhorar a aplicação compartilhando com os seus amigos',
               false,
               itemFunction: shareApp),
         ],

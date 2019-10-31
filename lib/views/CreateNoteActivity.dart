@@ -61,7 +61,7 @@ class _CreateNoteActivityState extends State<CreateNoteActivity> {
     if (_noteId == null) {
       _globalKey.currentState.showSnackBar(
         SnackBar(
-          content: Text('Nada digitado ate o momento'),
+          content: Text('Nada digitado até o momento'),
           duration: Duration(seconds: 1),
           elevation: 22,
           backgroundColor: Colors.deepPurple,
@@ -116,7 +116,7 @@ class _CreateNoteActivityState extends State<CreateNoteActivity> {
                     fontSize: 17
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Escreva o titulo da anotaçao',
+                  hintText: 'Escreva o título da anotação',
                   hintStyle: TextStyle(
                       color: Colors.grey
                   ),
@@ -139,7 +139,7 @@ class _CreateNoteActivityState extends State<CreateNoteActivity> {
                 ),
                 decoration: InputDecoration(
                   border: InputBorder.none,
-                  hintText: 'Descricao',
+                  hintText: 'Descrição',
                   hintStyle: TextStyle(
                     color: Colors.grey,
                   ),
@@ -162,59 +162,6 @@ class _CreateNoteActivityState extends State<CreateNoteActivity> {
       ),
 
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
-
-//      bottomNavigationBar: BottomAppBar(
-//        color: Colors.blueGrey[900],
-//        elevation: 15,
-//        child: Padding(
-//          padding: EdgeInsets.only(left: 8, right: 8),
-//          child: Row(
-//            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//            children: <Widget>[
-//
-//              Visibility(
-//                visible: _visible,
-//                child: FlatButton.icon(
-//                  icon: Icon(
-//                    Icons.rate_review,
-//                    color: Colors.white,
-//                  ),
-//                  label: Text(
-//                    'Visualizar nota ',
-//                    style: TextStyle(
-//                        color: Colors.white
-//                    ),
-//                  ),
-//                  color: Colors.blueGrey[700],
-//                  shape: RoundedRectangleBorder(
-//                    borderRadius: BorderRadius.circular(16),
-//                  ),
-//                  onPressed: _viewMarkdown,
-//                ),
-//              ),
-//
-//              FlatButton.icon(
-//                icon: Icon(
-//                  Icons.save_alt,
-//                  color: Colors.white,
-//                ),
-//                label: Text(
-//                  'Salvar progresso',
-//                  style: TextStyle(
-//                      color: Colors.white
-//                  ),
-//                ),
-//                color: Colors.green[700],
-//                shape: RoundedRectangleBorder(
-//                  borderRadius: BorderRadius.circular(16),
-//                ),
-//                onPressed: _createNote,
-//              ),
-//
-//            ],
-//          ),
-//        ),
-//      ),
     );
   }
 }
