@@ -2,7 +2,6 @@ import 'package:dolar_agora/dal/SQFLite.dart';
 import 'package:dolar_agora/models/Note.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 
 class ShowNoteActivity extends StatefulWidget {
@@ -27,23 +26,6 @@ class _ShowNoteActivityState extends State<ShowNoteActivity> {
     });
   }
 
-  void _onTapLink(url) async {
-    if (await canLaunch(url)) {
-      _globalKey.currentState.showSnackBar(
-          SnackBar(
-            content: Text('Impossivel carregar pagina da web'),
-            duration: Duration(seconds: 2),
-            behavior: SnackBarBehavior.fixed,
-            backgroundColor: Colors.black,
-            elevation: 5,
-          )
-      );
-
-    } else {
-      launch(url);
-    }
-  }
-
   @override
   void initState() {
     selectNoteFromDatabase();
@@ -61,7 +43,6 @@ class _ShowNoteActivityState extends State<ShowNoteActivity> {
         child: Scrollbar(
             child: Markdown(
               data: _note.description,
-              onTapLink: _onTapLink,
             )
         ),
       ),

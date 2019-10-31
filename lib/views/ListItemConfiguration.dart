@@ -57,7 +57,7 @@ class ListItemConfiguration extends StatelessWidget {
     } else {
       Scaffold.of(context).showSnackBar(
           SnackBar(
-              content: Text('URL nao pode ser carregada.')
+              content: Text('URL não pode ser carregada no momento. Verifique a sua conexão com a internet.')
           )
       );
     }

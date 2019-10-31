@@ -3,8 +3,8 @@ import 'package:dolar_agora/models/Note.dart';
 import 'package:dolar_agora/views/ShowNoteActivity.dart';
 import 'package:flutter/material.dart';
 
-class CreateNoteActivity extends StatefulWidget {
 
+class CreateNoteActivity extends StatefulWidget {
   int idNote = null;
   CreateNoteActivity({this.idNote});
 

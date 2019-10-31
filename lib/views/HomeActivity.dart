@@ -117,10 +117,7 @@ class _HomeState extends State<Home> {
       _iconOrder = icon;
       _globalKey.currentState.showSnackBar(
           SnackBar(
-            content: Text(
-                order,
-              textAlign: TextAlign.center,
-            ),
+            content: Text(order),
             duration: Duration(seconds: 1),
             backgroundColor: Colors.blueGrey[800],
           )
@@ -171,10 +168,14 @@ class _HomeState extends State<Home> {
 
     _globalKey.currentState.showSnackBar(
       SnackBar(
-        content: Text('Nota deletada.'),
-        duration: Duration(seconds: 3),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.deepPurple,
+        content: Text(
+            'Nota deletada.',
+          style: TextStyle(
+            fontWeight: FontWeight.bold
+          )
+        ),
+        duration: Duration(seconds: 2),
+        backgroundColor: Colors.redAccent,
       )
     );
 
@@ -244,62 +245,6 @@ class _HomeState extends State<Home> {
       ),
     );
   }
-}
-
-BottomAppBar bottomNavigator(context) {
-  void _createNote() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => CreateNoteActivity()),
-    ).then((value) {
-      ;
-    });
-  }
-
-  return BottomAppBar(
-    color: Colors.blueGrey[900],
-    elevation: 15,
-    child: Padding(
-      padding: EdgeInsets.only(left: 8, right: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          FlatButton.icon(
-            icon: Icon(
-              Icons.add,
-              color: Colors.white,
-            ),
-            label: Text(
-              'Criar nota',
-              style: TextStyle(color: Colors.white),
-            ),
-            color: Colors.blueGrey[700],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            onPressed: _createNote,
-          ),
-          FlatButton.icon(
-            icon: Icon(
-              Icons.list,
-              color: Colors.white,
-            ),
-            label: Text(''),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            onPressed: () {
-              showModalBottomSheet<Null>(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return _BottomDrawer(context);
-                  });
-            },
-          ),
-        ],
-      ),
-    ),
-  );
 }
 
 Widget _BottomDrawer(context) {
