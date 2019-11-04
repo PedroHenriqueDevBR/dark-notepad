@@ -122,7 +122,6 @@ class _HomeState extends State<Home> {
             backgroundColor: Colors.blueGrey[800],
           )
       );
-
     });
   }
 
@@ -144,7 +143,8 @@ class _HomeState extends State<Home> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => CreateNoteActivity(
+            builder: (context) =>
+                CreateNoteActivity(
                   idNote: index,
                 ))).then((value) {
       getNotesFromDatabase();
@@ -167,90 +167,106 @@ class _HomeState extends State<Home> {
     getNotesFromDatabase();
 
     _globalKey.currentState.showSnackBar(
-      SnackBar(
-        content: Text(
-            'Nota deletada.',
-          style: TextStyle(
-            fontWeight: FontWeight.bold
-          )
-        ),
-        duration: Duration(seconds: 2),
-        backgroundColor: Colors.redAccent,
-      )
+        SnackBar(
+          content: Text(
+              'Nota deletada.',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold
+              )
+          ),
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.redAccent,
+        )
     );
-
   }
 
   Widget createItemList(context, index) {
     Note _note = notes[index];
 
     return Dismissible(
-      key: Key('${notes[index].id}'),
-      direction: DismissDirection.startToEnd,
-      background: Container(
-        color: Colors.red,
-        padding: EdgeInsets.all(16),
-        margin: EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          children: <Widget>[
-            Icon(
-              Icons.delete,
-              color: Colors.white,
-              size: 30,
-            )
-          ],
-        ),
-      ),
-      onDismissed: (direction) {
-        if (direction == DismissDirection.startToEnd) {
-          deleteNote(notes[index].id);
-        }
-      },
-      child: Card(
-        elevation: 0,
-        color: Colors.deepPurpleAccent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5),
-        ),
-        child: ListTile(
-          title: Text(
-            _note.title,
-            style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                textBaseline: TextBaseline.alphabetic),
+        key: Key('${notes[index].id}'),
+        direction: DismissDirection.horizontal,
+        background: Container(
+          padding: EdgeInsets.all(16),
+          margin: EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            children: <Widget>[
+              Icon(
+                Icons.delete,
+                color: Colors.red,
+                size: 30,
+              )
+            ],
           ),
-          subtitle: Container(
-            padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-            child: Text(
-              _note.description,
-              maxLines: 9,
-              style: TextStyle(
-                color: Colors.white,
-              ),
-            ),
-          ),
-          trailing: IconButton(
-              icon: Icon(
-                Icons.edit,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                _editNote(_note.id);
-              }),
-          onTap: () {
-            _showNote(_note.id);
-          },
         ),
-      ),
+        secondaryBackground: Container(
+          padding: EdgeInsets.all(16),
+          margin: EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              Icon(
+                Icons.delete,
+                color: Colors.red,
+                size: 30,
+              )
+            ],
+          ),
+        ),
+        onDismissed: (direction)
+    {
+      if (direction == DismissDirection.startToEnd) {
+        deleteNote(notes[index].id);
+      }
+    },
+    child: Card(
+    elevation: 0,
+    color: Colors.deepPurpleAccent,
+    shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(5),
+    ),
+    child: ListTile(
+    title: Text(
+    _note.title,
+    style: TextStyle(
+    color: Colors.white,
+    fontWeight: FontWeight.bold,
+    textBaseline: TextBaseline.alphabetic),
+    ),
+    subtitle: Container(
+    padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+    child: Text(
+    _note.description,
+    maxLines: 9,
+    style: TextStyle(
+    color: Colors.white,
+    ),
+    ),
+    ),
+    trailing: IconButton(
+    icon: Icon(
+    Icons.edit,
+    color: Colors.white,
+    ),
+    onPressed: () {
+    _editNote(_note.id);
+    }),
+    onTap: () {
+    _showNote(_note.id);
+    },
+    )
+    ,
+    )
+    ,
     );
   }
 }
 
 Widget _BottomDrawer(context) {
   void shareApp() {
-    Share.share('Markdown editor, editor de markdown simples de utilizar, sem anúncios. '
-        'Baixe agora mesmo em https://play.google.com/store/apps/details?id=com.pedrohenriquedevbr.dolar_agora');
+    Share.share(
+        'Markdown editor, editor de markdown simples de utilizar, sem anúncios. '
+            'Baixe agora mesmo em https://play.google.com/store/apps/details?id=com.pedrohenriquedevbr.dolar_agora');
   }
 
   return Drawer(
