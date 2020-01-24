@@ -31,3 +31,8 @@ O desenvolvimento da aplicação se deu utilizando a linguagem de programação 
 Além de servir como plataforma para a criação de documentações de projetos, pode servir também como um bloco de notas, podendo ser utilizado no dia a dia.
 
 O banco de dados utilizado para armazenar dados na aplicação é o SQLite.
+
+## Mapa da aplicação
+
+![DarkNotepad](https://user-images.githubusercontent.com/36716898/73035826-51c99200-3e28-11ea-81ea-3924ddb41895.png)
+
