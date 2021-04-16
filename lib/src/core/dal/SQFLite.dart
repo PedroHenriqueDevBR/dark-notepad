@@ -70,8 +70,7 @@ class SQLFlite {
   deleteNoteOfID(int id) async {
     Database db = await _openDataBase();
     String sql = "DELETE FROM note where id = $id";
-
-    db.delete('note', where: 'id = ?', whereArgs: [id]);
+    await db.delete('note', where: 'id = ?', whereArgs: [id]);
   }
 
   updateNoteOfID(int id, {required String title, required String description}) async {
@@ -86,7 +85,7 @@ class SQLFlite {
       dataNote['description'] = description;
     }
 
-    db.update(
+    await db.update(
       'note',
       dataNote,
       where: 'id = ?',
