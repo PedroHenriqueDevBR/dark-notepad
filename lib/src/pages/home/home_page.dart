@@ -1,9 +1,11 @@
 import 'package:asuka/asuka.dart' as asuka;
 import 'package:dark_notepad/src/core/dal/SQFLite.dart';
 import 'package:dark_notepad/src/core/models/Note.dart';
+import 'package:dark_notepad/src/pages/home/home_controller.dart';
 import 'package:dark_notepad/src/pages/show_note/ShowNoteActivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:rx_notifier/rx_notifier.dart';
 import 'package:share/share.dart';
 
 import '../create_note/CreateNoteActivity.dart';
@@ -16,44 +18,56 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<Note> notes = [];
-  bool _orderDesc = false;
-  IconData _iconOrder = Icons.arrow_downward;
+  late HomeController _controller;
 
   @override
   void initState() {
-    getNotesFromDatabase();
+    _controller = HomeController();
+    _controller.getNotesFromDatabase();
     super.initState();
-  }
-
-  void showMessage(String message) {
-    asuka.showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        brightness: Brightness.dark,
         backgroundColor: Colors.blueGrey[900],
         title: Text('Markdown Editor'),
         actions: <Widget>[
           IconButton(
             tooltip: 'Ordenação',
             icon: Icon(
-              _iconOrder,
+              _controller.iconOrder.value,
               color: Colors.white,
             ),
-            onPressed: _orderList,
+            onPressed: _controller.orderList,
           )
         ],
       ),
       body: Container(
         color: Colors.black,
-        child: ListView.builder(
-          padding: EdgeInsets.all(4),
-          itemCount: notes.length,
-          itemBuilder: createItemList,
-        ),
+        child: RxBuilder(builder: (value) {
+          return ListView.builder(
+            padding: EdgeInsets.all(4),
+            itemCount: _controller.notes.length,
+            itemBuilder: (context, index) {
+              return createItemList(
+                context: context,
+                note: _controller.notes[index],
+                onTap: () {
+                  _controller.showNote(context: context, id: _controller.notes[index].id!);
+                },
+                onEdit: () {
+                  _controller.editNote(context: context, id: _controller.notes[index].id!);
+                },
+                onDelete: () {
+                  _controller.deleteNote(id: _controller.notes[index].id!);
+                },
+              );
+            },
+          );
+        }),
       ),
       bottomNavigationBar: BottomAppBar(
         color: Colors.blueGrey[900],
@@ -76,7 +90,9 @@ class _HomeState extends State<Home> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                onPressed: _createNote,
+                onPressed: () {
+                  _controller.createNote(context: context);
+                },
               ),
               FlatButton.icon(
                 icon: Icon(
@@ -102,75 +118,16 @@ class _HomeState extends State<Home> {
     );
   }
 
-  _orderList() {
-    IconData icon;
-    String order = '';
-
-    setState(() {
-      _orderDesc = !_orderDesc;
-      getNotesFromDatabase();
-
-      if (_orderDesc == true) {
-        icon = Icons.arrow_upward;
-        order = 'decrescente';
-      } else {
-        icon = Icons.arrow_downward;
-        order = 'crescente';
-      }
-
-      _iconOrder = icon;
-      showMessage(order);
-    });
-  }
-
-  _createNote() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => CreateNoteActivity()),
-    ).then((value) {
-      getNotesFromDatabase();
-    });
-  }
-
-  _showNote(int index) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => ShowNoteActivity(index)));
-  }
-
-  _editNote(int index) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => CreateNoteActivity(
-                  idNote: index,
-                ))).then((value) {
-      getNotesFromDatabase();
-    });
-  }
-
-  // Operaçoes de banco de dados
-
-  getNotesFromDatabase() async {
-    SQLFlite sqlFlite = SQLFlite();
-    List<Note> response = await sqlFlite.getAllNotes(orderDefault: _orderDesc);
-    setState(() {
-      notes = response;
-    });
-  }
-
-  deleteNote(int id) async {
-    SQLFlite sqlFlite = SQLFlite();
-    sqlFlite.deleteNoteOfID(id);
-    getNotesFromDatabase();
-
-    showMessage('Nota deletada');
-  }
-
-  Widget createItemList(context, index) {
-    Note _note = notes[index];
-
+  Widget createItemList({
+    required BuildContext context,
+    required Note note,
+    required Function onTap,
+    required Function onEdit,
+    required Function onDelete,
+  }) {
     return Dismissible(
-      key: Key('${notes[index].id}'),
-      direction: DismissDirection.horizontal,
+      key: Key('${note.id}'),
+      direction: DismissDirection.endToStart,
       background: Container(
         padding: EdgeInsets.all(16),
         margin: EdgeInsets.symmetric(vertical: 4),
@@ -199,8 +156,8 @@ class _HomeState extends State<Home> {
         ),
       ),
       onDismissed: (direction) {
-        if (direction == DismissDirection.startToEnd) {
-          deleteNote(notes[index].id!);
+        if (direction == DismissDirection.endToStart) {
+          onDelete();
         }
       },
       child: Card(
@@ -211,13 +168,13 @@ class _HomeState extends State<Home> {
         ),
         child: ListTile(
           title: Text(
-            _note.title,
+            note.title,
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, textBaseline: TextBaseline.alphabetic),
           ),
           subtitle: Container(
             padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
             child: Text(
-              _note.description,
+              note.description,
               maxLines: 9,
               style: TextStyle(
                 color: Colors.white,
@@ -230,10 +187,10 @@ class _HomeState extends State<Home> {
                 color: Colors.white,
               ),
               onPressed: () {
-                _editNote(_note.id!);
+                onEdit();
               }),
           onTap: () {
-            _showNote(_note.id!);
+            onTap();
           },
         ),
       ),
@@ -273,8 +230,6 @@ Widget _BottomDrawer(context) {
           SizedBox(
             height: 8,
           ),
-//          ListItemConfiguration(Icons.color_lens, 'Alterar cor principal',
-//              'Alterar a cor principal da aplicacao, cor dos itens e da barra de configuraçao'),
           ListItemConfiguration(
             context: context,
             icon: Icons.library_books,
