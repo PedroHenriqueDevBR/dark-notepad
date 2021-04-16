@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart' as url_launcher;
 import 'package:asuka/asuka.dart' as asuka;
 
 class ListItemConfiguration extends StatelessWidget {

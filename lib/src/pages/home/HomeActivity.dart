@@ -1,14 +1,14 @@
 import 'package:asuka/asuka.dart' as asuka;
-import 'package:dark_notepad/dal/SQFLite.dart';
-import 'package:dark_notepad/models/Note.dart';
-import 'package:dark_notepad/views/ShowNoteActivity.dart';
+import 'package:dark_notepad/src/core/dal/SQFLite.dart';
+import 'package:dark_notepad/src/core/models/Note.dart';
+import 'package:dark_notepad/src/pages/show_note/ShowNoteActivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:share/share.dart';
 
-import 'CreateNoteActivity.dart';
-import 'ListItemConfiguration.dart';
-import 'ShowNoteActivity.dart';
+import '../create_note/CreateNoteActivity.dart';
+import '../../core/components/ListItemConfiguration.dart';
+import '../show_note/ShowNoteActivity.dart';
 
 class Home extends StatefulWidget {
   @override

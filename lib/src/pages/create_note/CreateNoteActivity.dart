@@ -1,7 +1,7 @@
 import 'package:asuka/asuka.dart' as asuka;
-import 'package:dark_notepad/dal/SQFLite.dart';
-import 'package:dark_notepad/models/Note.dart';
-import 'package:dark_notepad/views/ShowNoteActivity.dart';
+import 'package:dark_notepad/src/core/dal/SQFLite.dart';
+import 'package:dark_notepad/src/core/models/Note.dart';
+import 'package:dark_notepad/src/pages/show_note/ShowNoteActivity.dart';
 import 'package:flutter/material.dart';
 
 class CreateNoteActivity extends StatefulWidget {

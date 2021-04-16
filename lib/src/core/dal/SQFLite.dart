@@ -1,4 +1,4 @@
-import 'package:dark_notepad/models/Note.dart';
+import 'package:dark_notepad/src/core/models/Note.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
