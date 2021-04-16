@@ -1,37 +1,33 @@
-import 'package:dolar_agora/dal/SQFLite.dart';
-import 'package:dolar_agora/models/Note.dart';
-import 'package:dolar_agora/views/ShowNoteActivity.dart';
+import 'package:asuka/asuka.dart' as asuka;
+import 'package:dark_notepad/dal/SQFLite.dart';
+import 'package:dark_notepad/models/Note.dart';
+import 'package:dark_notepad/views/ShowNoteActivity.dart';
 import 'package:flutter/material.dart';
 
-
 class CreateNoteActivity extends StatefulWidget {
-  int idNote = null;
+  late int? idNote;
   CreateNoteActivity({this.idNote});
 
   @override
-  _CreateNoteActivityState createState() => _CreateNoteActivityState(idNote);
+  _CreateNoteActivityState createState() => _CreateNoteActivityState();
 }
 
 class _CreateNoteActivityState extends State<CreateNoteActivity> {
   //  bool _visible = false;
-  int _noteId;
+  int? _noteId;
   TextEditingController _txtTitle = TextEditingController();
-  TextEditingController _txtDescription= TextEditingController();
+  TextEditingController _txtDescription = TextEditingController();
   String _titleText = '';
-  GlobalKey<ScaffoldState> _globalKey = new GlobalKey<ScaffoldState>();
-
-  _CreateNoteActivityState(this._noteId);
 
   loadData() async {
     if (_noteId != null) {
       SQLFlite sqlFlite = SQLFlite();
-      Note response = await sqlFlite.getNoteOfID(_noteId);
+      Note response = await sqlFlite.getNoteOfID(_noteId!);
 
       _txtTitle.text = response.title;
       _txtDescription.text = response.description;
 
       setState(() {
-//        _visible = true;
         _titleText = _txtTitle.text;
       });
     }
@@ -49,7 +45,7 @@ class _CreateNoteActivityState extends State<CreateNoteActivity> {
 //        _visible = true;
       });
     } else {
-      sqlFlite.updateNoteOfID(_noteId, title: _txtTitle.text, description: _txtDescription.text);
+      sqlFlite.updateNoteOfID(_noteId!, title: _txtTitle.text, description: _txtDescription.text);
     }
 
     setState(() {
@@ -57,43 +53,44 @@ class _CreateNoteActivityState extends State<CreateNoteActivity> {
     });
   }
 
+  void showMessage(String message) {
+    asuka.showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 1),
+        elevation: 22,
+        backgroundColor: Colors.deepPurple,
+        behavior: SnackBarBehavior.fixed,
+      ),
+    );
+  }
+
   void _viewMarkdown() {
     if (_noteId == null) {
-      _globalKey.currentState.showSnackBar(
-        SnackBar(
-          content: Text('Nada digitado até o momento'),
-          duration: Duration(seconds: 1),
-          elevation: 22,
-          backgroundColor: Colors.deepPurple,
-          behavior: SnackBarBehavior.fixed,
-        )
-      );
+      showMessage('Nada digitado até o momento');
     } else {
       Navigator.push(
         context,
-        MaterialPageRoute(
-            builder: (context) => ShowNoteActivity(_noteId)
-        ),
+        MaterialPageRoute(builder: (context) => ShowNoteActivity(_noteId!)),
       );
     }
   }
 
   @override
   void initState() {
-    loadData();
     super.initState();
+    loadData();
+    this._noteId = widget.idNote;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _globalKey,
       appBar: AppBar(
         title: Text(_titleText),
         backgroundColor: Colors.blueGrey[900],
         elevation: 0,
       ),
-
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
@@ -110,23 +107,19 @@ class _CreateNoteActivityState extends State<CreateNoteActivity> {
                 autocorrect: true,
                 cursorColor: Colors.grey[200],
                 controller: _txtTitle,
-                style: TextStyle(
-                    color: Colors.white,
-                    decorationColor: Colors.white,
-                    fontSize: 17
-                ),
+                style: TextStyle(color: Colors.white, decorationColor: Colors.white, fontSize: 17),
                 decoration: InputDecoration(
                   hintText: 'Escreva o título da anotação',
-                  hintStyle: TextStyle(
-                      color: Colors.grey
-                  ),
+                  hintStyle: TextStyle(color: Colors.grey),
                   border: InputBorder.none,
                 ),
                 onChanged: (text) {
                   _createNote();
                 },
               ),
-              SizedBox(height: 10,),
+              SizedBox(
+                height: 10,
+              ),
               TextFormField(
                 cursorColor: Colors.grey[200],
                 keyboardType: TextInputType.multiline,
@@ -152,15 +145,12 @@ class _CreateNoteActivityState extends State<CreateNoteActivity> {
           ),
         ),
       ),
-
-
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _viewMarkdown,
         icon: Icon(Icons.code),
         label: Text('View'),
         backgroundColor: Colors.purple,
       ),
-
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
     );
   }

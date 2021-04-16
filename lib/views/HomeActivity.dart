@@ -1,11 +1,13 @@
-import 'package:dolar_agora/dal/SQFLite.dart';
-import 'package:dolar_agora/models/Note.dart';
-import 'package:dolar_agora/views/ListItemConfiguration.dart';
+import 'package:asuka/asuka.dart' as asuka;
+import 'package:dark_notepad/dal/SQFLite.dart';
+import 'package:dark_notepad/models/Note.dart';
+import 'package:dark_notepad/views/ShowNoteActivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:share/share.dart';
 
 import 'CreateNoteActivity.dart';
+import 'ListItemConfiguration.dart';
 import 'ShowNoteActivity.dart';
 
 class Home extends StatefulWidget {
@@ -17,7 +19,6 @@ class _HomeState extends State<Home> {
   List<Note> notes = [];
   bool _orderDesc = false;
   IconData _iconOrder = Icons.arrow_downward;
-  GlobalKey<ScaffoldState> _globalKey = new GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -25,10 +26,13 @@ class _HomeState extends State<Home> {
     super.initState();
   }
 
+  void showMessage(String message) {
+    asuka.showSnackBar(SnackBar(content: Text(message)));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _globalKey,
       appBar: AppBar(
         backgroundColor: Colors.blueGrey[900],
         title: Text('Markdown Editor'),
@@ -115,13 +119,7 @@ class _HomeState extends State<Home> {
       }
 
       _iconOrder = icon;
-      _globalKey.currentState.showSnackBar(
-          SnackBar(
-            content: Text(order),
-            duration: Duration(seconds: 1),
-            backgroundColor: Colors.blueGrey[800],
-          )
-      );
+      showMessage(order);
     });
   }
 
@@ -135,16 +133,14 @@ class _HomeState extends State<Home> {
   }
 
   _showNote(int index) {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => ShowNoteActivity(index)));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => ShowNoteActivity(index)));
   }
 
   _editNote(int index) {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) =>
-                CreateNoteActivity(
+            builder: (context) => CreateNoteActivity(
                   idNote: index,
                 ))).then((value) {
       getNotesFromDatabase();
@@ -166,107 +162,89 @@ class _HomeState extends State<Home> {
     sqlFlite.deleteNoteOfID(id);
     getNotesFromDatabase();
 
-    _globalKey.currentState.showSnackBar(
-        SnackBar(
-          content: Text(
-              'Nota deletada.',
-              style: TextStyle(
-                  fontWeight: FontWeight.bold
-              )
-          ),
-          duration: Duration(seconds: 2),
-          backgroundColor: Colors.redAccent,
-        )
-    );
+    showMessage('Nota deletada');
   }
 
   Widget createItemList(context, index) {
     Note _note = notes[index];
 
     return Dismissible(
-        key: Key('${notes[index].id}'),
-        direction: DismissDirection.horizontal,
-        background: Container(
-          padding: EdgeInsets.all(16),
-          margin: EdgeInsets.symmetric(vertical: 4),
-          child: Row(
-            children: <Widget>[
-              Icon(
-                Icons.delete,
-                color: Colors.red,
-                size: 30,
-              )
-            ],
-          ),
+      key: Key('${notes[index].id}'),
+      direction: DismissDirection.horizontal,
+      background: Container(
+        padding: EdgeInsets.all(16),
+        margin: EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          children: <Widget>[
+            Icon(
+              Icons.delete,
+              color: Colors.red,
+              size: 30,
+            )
+          ],
         ),
-        secondaryBackground: Container(
-          padding: EdgeInsets.all(16),
-          margin: EdgeInsets.symmetric(vertical: 4),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              Icon(
-                Icons.delete,
-                color: Colors.red,
-                size: 30,
-              )
-            ],
-          ),
+      ),
+      secondaryBackground: Container(
+        padding: EdgeInsets.all(16),
+        margin: EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            Icon(
+              Icons.delete,
+              color: Colors.red,
+              size: 30,
+            )
+          ],
         ),
-        onDismissed: (direction)
-    {
-      if (direction == DismissDirection.startToEnd) {
-        deleteNote(notes[index].id);
-      }
-    },
-    child: Card(
-    elevation: 0,
-    color: Colors.deepPurpleAccent,
-    shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(5),
-    ),
-    child: ListTile(
-    title: Text(
-    _note.title,
-    style: TextStyle(
-    color: Colors.white,
-    fontWeight: FontWeight.bold,
-    textBaseline: TextBaseline.alphabetic),
-    ),
-    subtitle: Container(
-    padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-    child: Text(
-    _note.description,
-    maxLines: 9,
-    style: TextStyle(
-    color: Colors.white,
-    ),
-    ),
-    ),
-    trailing: IconButton(
-    icon: Icon(
-    Icons.edit,
-    color: Colors.white,
-    ),
-    onPressed: () {
-    _editNote(_note.id);
-    }),
-    onTap: () {
-    _showNote(_note.id);
-    },
-    )
-    ,
-    )
-    ,
+      ),
+      onDismissed: (direction) {
+        if (direction == DismissDirection.startToEnd) {
+          deleteNote(notes[index].id!);
+        }
+      },
+      child: Card(
+        elevation: 0,
+        color: Colors.deepPurpleAccent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: ListTile(
+          title: Text(
+            _note.title,
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, textBaseline: TextBaseline.alphabetic),
+          ),
+          subtitle: Container(
+            padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+            child: Text(
+              _note.description,
+              maxLines: 9,
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+          ),
+          trailing: IconButton(
+              icon: Icon(
+                Icons.edit,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                _editNote(_note.id!);
+              }),
+          onTap: () {
+            _showNote(_note.id!);
+          },
+        ),
+      ),
     );
   }
 }
 
 Widget _BottomDrawer(context) {
   void shareApp() {
-    Share.share(
-        'Markdown editor, editor de markdown simples de utilizar, sem anúncios. '
-            'Baixe agora mesmo em https://play.google.com/store/apps/details?id=com.pedrohenriquedevbr.dolar_agora');
+    Share.share('Markdown editor, editor de markdown simples de utilizar, sem anúncios. '
+        'Baixe agora mesmo em https://play.google.com/store/apps/details?id=com.pedrohenriquedevbr.dolar_agora');
   }
 
   return Drawer(
@@ -298,18 +276,14 @@ Widget _BottomDrawer(context) {
 //          ListItemConfiguration(Icons.color_lens, 'Alterar cor principal',
 //              'Alterar a cor principal da aplicacao, cor dos itens e da barra de configuraçao'),
           ListItemConfiguration(
-              context,
-              Icons.library_books,
-              'Markdown',
-              'Manual markdown, aprenda markdown e otimize as suas anotações',
-              true),
-          ListItemConfiguration(
-              context,
-              Icons.share,
-              'Compartilhar',
-              'Ajude a melhorar a aplicação compartilhando com os seus amigos',
-              false,
-              itemFunction: shareApp),
+            context: context,
+            icon: Icons.library_books,
+            title: 'Markdown',
+            subtitle: 'Manual markdown, aprenda markdown e otimize as suas anotações',
+            showMarkdown: true,
+            itemFunction: () {},
+          ),
+          ListItemConfiguration(context: context, icon: Icons.share, title: 'Compartilhar', subtitle: 'Ajude a melhorar a aplicação compartilhando com os seus amigos', showMarkdown: false, itemFunction: shareApp),
         ],
       ),
     ),

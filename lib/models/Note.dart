@@ -1,24 +1,26 @@
 class Note {
-  int id;
-  String _title;
-  String _description;
+  int? id;
+  late String _title;
+  late String _description;
 
-  Note(this._title, this._description, {this.id});
+  Note(String title, String description, {this.id}) {
+    this._title = title != null ? title : '';
+    this._description = description != null ? description : '';
+  }
 
   set title(String title) {
     this._title = title;
   }
 
-  get title {
+  String get title {
     return this._title;
   }
 
-  set description(String desc) {
+  void set description(String desc) {
     this._description = desc;
   }
 
-  get description {
+  String get description {
     return this._description;
   }
-
 }

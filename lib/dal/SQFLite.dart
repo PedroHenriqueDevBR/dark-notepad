@@ -1,10 +1,8 @@
-import 'package:dolar_agora/models/Note.dart';
+import 'package:dark_notepad/models/Note.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
-
 class SQLFlite {
-
   List<Note> notes = [];
 
   _openDataBase() async {
@@ -16,10 +14,10 @@ class SQLFlite {
       version: 1,
       onCreate: (db, dbLastVersion) {
         String sql = 'create table if not exists note ('
-                      'id INTEGER PRIMARY KEY AUTOINCREMENT, '
-                      'title VARCHAR, '
-                      'description TEXT'
-                      ')';
+            'id INTEGER PRIMARY KEY AUTOINCREMENT, '
+            'title VARCHAR, '
+            'description TEXT'
+            ')';
         db.execute(sql);
       },
     );
@@ -30,20 +28,19 @@ class SQLFlite {
   addNote(Note note) async {
     Database db = await _openDataBase();
 
-    Map<String, dynamic> dataNote = {
-      'title': note.title,
-      'description': note.description
-    };
+    Map<String, dynamic> dataNote = {'title': note.title, 'description': note.description};
 
     int response = await db.insert('note', dataNote);
     return response;
   }
 
-  getAllNotes({bool orderDefault}) async {
+  getAllNotes({required bool orderDefault}) async {
     Database db = await _openDataBase();
 
     String order = ';';
-    if (orderDefault == true) { order = ' ORDER BY id DESC;'; }
+    if (orderDefault == true) {
+      order = ' ORDER BY id DESC;';
+    }
     String sql = "SELECT * FROM note" + order;
 
     List notes = await db.rawQuery(sql);
@@ -74,14 +71,10 @@ class SQLFlite {
     Database db = await _openDataBase();
     String sql = "DELETE FROM note where id = $id";
 
-    db.delete(
-      'note',
-      where: 'id = ?',
-      whereArgs: [id]
-    );
+    db.delete('note', where: 'id = ?', whereArgs: [id]);
   }
 
-  updateNoteOfID(int id, {String title, String description}) async {
+  updateNoteOfID(int id, {required String title, required String description}) async {
     Database db = await _openDataBase();
 
     Map<String, dynamic> dataNote = {};
@@ -100,5 +93,4 @@ class SQLFlite {
       whereArgs: [id],
     );
   }
-
 }
