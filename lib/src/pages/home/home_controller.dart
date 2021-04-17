@@ -1,7 +1,7 @@
 import 'package:asuka/asuka.dart' as asuka;
 import 'package:dark_notepad/src/core/dal/SQFLite.dart';
 import 'package:dark_notepad/src/core/models/Note.dart';
-import 'package:dark_notepad/src/pages/create_note/CreateNoteActivity.dart';
+import 'package:dark_notepad/src/pages/create_note/create_note_page.dart';
 import 'package:dark_notepad/src/pages/show_note/ShowNoteActivity.dart';
 import 'package:flutter/material.dart';
 import 'package:rx_notifier/rx_notifier.dart';
@@ -38,7 +38,7 @@ class HomeController {
   void editNote({required BuildContext context, required int id}) async {
     await Navigator.push(context, MaterialPageRoute(builder: (context) {
       return CreateNoteActivity(
-        idNote: id,
+        id: id,
       );
     })).then((value) {
       getNotesFromDatabase();
