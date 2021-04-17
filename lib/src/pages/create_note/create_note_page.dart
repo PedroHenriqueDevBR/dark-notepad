@@ -1,6 +1,5 @@
 import 'package:dark_notepad/src/pages/create_note/create_note_components.dart';
 import 'package:dark_notepad/src/pages/create_note/create_note_controller.dart';
-import 'package:dark_notepad/src/pages/home/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:rx_notifier/rx_notifier.dart';
 

@@ -2,7 +2,7 @@ import 'package:asuka/asuka.dart' as asuka;
 import 'package:dark_notepad/src/core/dal/SQFLite.dart';
 import 'package:dark_notepad/src/core/models/Note.dart';
 import 'package:dark_notepad/src/pages/create_note/create_note_page.dart';
-import 'package:dark_notepad/src/pages/show_note/ShowNoteActivity.dart';
+import 'package:dark_notepad/src/pages/show_note/show_note_page.dart';
 import 'package:flutter/material.dart';
 import 'package:rx_notifier/rx_notifier.dart';
 import 'package:share/share.dart';
